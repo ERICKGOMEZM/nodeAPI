@@ -1,0 +1,26 @@
+//app.js
+
+import express from 'express';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import registerTallerRoutes from './routes/registerTallerRoute.js';
+
+
+dotenv.config();
+
+const app = express();
+
+app.use(cors({
+    origen: 'http://localhost:8080',
+}));
+
+app.use(bodyParser.json());
+
+// Rutas para la API
+app.use('/api', registerTallerRoutes); // Registro de talleres
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
