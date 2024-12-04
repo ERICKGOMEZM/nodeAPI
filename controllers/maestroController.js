@@ -1,8 +1,6 @@
-//controllers/maestroController.js
-
 import { Maestro, MaestroTaller } from '../models/maestroModel.js';
 import jwt from 'jsonwebtoken';
-import pool from '../config/db.js'; // Asegúrate de importar pool
+import pool from '../config/db.js';
 
 export const registerMaestro = async (req, res) => {
   const { nombre, apellido_paterno, apellido_materno, edad, matricula, correo, contraseña, id_taller } = req.body;
@@ -11,6 +9,20 @@ export const registerMaestro = async (req, res) => {
     const parsedEdad = parseInt(edad, 10);
     if (isNaN(parsedEdad) || parsedEdad <= 0) {
       return res.status(400).json({ message: 'La edad debe ser un número válido y mayor a 0' });
+    }
+
+    // Validación del correo
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@utvtol\.edu\.mx$/;
+    if (!emailRegex.test(correo)) {
+      return res.status(400).json({ message: 'El correo debe tener el dominio @utvtol.edu.mx' });
+    }
+
+    // Validación de la contraseña
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+    if (!passwordRegex.test(contraseña)) {
+      return res.status(400).json({
+        message: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial'
+      });
     }
 
     if (!contraseña || contraseña.trim() === '') {
@@ -91,8 +103,10 @@ export const loginMaestro = async (req, res) => {
           correo: maestro.correo 
       }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+      // Retornar respuesta con alerta
       return res.status(200).json({
           message: 'Inicio de sesión exitoso',
+          alert: '¡Inicio de sesión exitoso!', // Agregado para la alerta en el frontend
           maestro: { 
               id: maestro.id_maestro, 
               nombre: maestro.nombre, 
@@ -106,7 +120,6 @@ export const loginMaestro = async (req, res) => {
       return res.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
   }
 };
-
 
 
 // Obtener la información del maestro y su taller asignado

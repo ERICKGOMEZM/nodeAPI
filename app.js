@@ -20,7 +20,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origen: 'http://localhost:8080',
+    origen: ' http://localhost:86 ',
 }));
 
 app.use(bodyParser.json());
@@ -37,7 +37,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api', listaFutbolRoute);  // Ruta que maneja los alumnos del taller de fútbol
 app.use('/api', asistenciaRoutes);  // Agregar la ruta para las justificaciones
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 86;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

@@ -6,16 +6,37 @@ import { generateToken } from '../utils/jwt.js';
 export const register = async (req, res) => {
     const { nombre, correo, matricula, contraseña, edad, genero, apellido_paterno, apellido_materno } = req.body;
 
+    // Validación del correo
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@utvtol\.edu\.mx$/;
+    if (!emailRegex.test(correo)) {
+        return res.status(400).json({ message: 'El correo debe ser del dominio @utvtol.edu.mx' });
+    }
+
+    // Validación de la contraseña
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(contraseña)) {
+        return res.status(400).json({
+            message: 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, un número y un carácter especial.',
+        });
+    }
+
+    // Validación de la matrícula
+    const matriculaRegex = /^\d{10}$/;
+    if (!matriculaRegex.test(matricula)) {
+        return res.status(400).json({
+            message: 'La matrícula debe tener exactamente 10 dígitos numéricos.',
+        });
+    }
+
+    // Validación del género
     const generoMap = {
         female: 'mujer',
         male: 'hombre',
         other: 'otro',
     };
-
     const generoTransformado = generoMap[genero];
-
     if (!generoTransformado) {
-        return res.status(400).json({ message: "Género no válido" });
+        return res.status(400).json({ message: 'Género no válido' });
     }
 
     try {
@@ -41,8 +62,23 @@ export const register = async (req, res) => {
     }
 };
 
+
 export const login = async (req, res) => {
     const { correo, contraseña } = req.body;
+
+    // Validación del correo
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@utvtol\.edu\.mx$/;
+    if (!emailRegex.test(correo)) {
+        return res.status(400).json({ message: 'El correo debe ser del dominio @utvtol.edu.mx' });
+    }
+
+    // Validación de la contraseña
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(contraseña)) {
+        return res.status(400).json({
+            message: 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, un número y un carácter especial.',
+        });
+    }
 
     try {
         const user = await User.findByEmail(correo);
@@ -68,6 +104,7 @@ export const login = async (req, res) => {
         res.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
     }
 };
+
 
 export const getUserProfile = async (req, res) => {
     const { id_alumno } = req.params; // El ID se pasará como parámetro en la URL
